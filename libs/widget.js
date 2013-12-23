@@ -1,3 +1,5 @@
+/* Version 1.0.0 */
+
 // Inspired by base2 and Prototype
 (function() {
     var initializing = false;
@@ -46,6 +48,15 @@
 
 })();
 
+
+/*
+*
+* Authored by: MelonHuang 
+*
+* Email: <melonh0327@gmail.com>
+* Github: https://github.com/melonHuang 
+*
+* */
 
 (function() {
     var EVENT_SPLITTER = /\s+/;
@@ -458,11 +469,6 @@
         me[methodName]._isAspected = true;
     }
 
-    // 将字符串转为首字母大写
-    function firstLetterUc(str) {
-        return str.charAt(0).toUpperCase() + str.substring(1);
-    }
-
     // 将字符串转为首字母小写
     function firstLetterLc(str) {
         return str.charAt(0).toLowerCase() + str.substring(1);
@@ -471,13 +477,21 @@
     this.Base = Base;
 })();
 
+/*
+*
+* Authored by: MelonHuang 
+*
+* Email: <melonh0327@gmail.com>
+* Github: https://github.com/melonHuang 
+*
+* */
 (function() {
 
     var cachedWidgets = {};
     var DATA_WIDGET_ID = 'data-widget-id';
     var ON_RENDER_PATTERN = /^_onRender([A-Z](.)*)/;
     var EVENT_NS = '.widget-';
-    var ATTR_IN_EVENTS = /{{(.*)}}/;
+    var ATTR_IN_CONFIG = /{\$(.*)}/;
 
     /*
     * Class Widget
@@ -818,7 +832,7 @@
         var event = {};
         var m = eventKey.match(/^(\S+)\s*(.*)$/);
         event.type = m[1] + EVENT_NS + widget.wid;
-        event.selector = m[2].replace(ATTR_IN_EVENTS, function() { return widget.get(arguments[1])});
+        event.selector = m[2].replace(ATTR_IN_CONFIG, function() { return widget.get(arguments[1])});
         return event;
     }
 
@@ -864,3 +878,4 @@
 
     this.Widget = Widget;
 })();
+

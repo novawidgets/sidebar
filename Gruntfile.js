@@ -4,13 +4,15 @@ module.exports = function(grunt) {
     // Concat config
     var concatConfig = {
         options: {
-            seperator: ';'
+            seperator: ';',
+            banner: '/* Version <%= concat.options.version %> */\n\n'
         }
     };
     for(widget in buildConfig) {
         concatConfig[widget] = {
             files: buildConfig[widget].files
         };
+        concatConfig.options.version = buildConfig[widget].version;
     }
 
     // qiwoobuild config
@@ -34,4 +36,6 @@ module.exports = function(grunt) {
 
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-qiwoobuild');
+
+    grunt.registerTask('default', ['concat', 'qiwoobuild']);
 }

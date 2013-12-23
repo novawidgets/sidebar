@@ -1,6 +1,8 @@
-/* Version 1.0.0 */
+(function(define, global) { 
+define(['module/widget/1.0.0/widget'], function(Widget) {
+Widget = Widget || this.Widget;
 
-(function() {
+
     var prefix = (function () {
         var styles = window.getComputedStyle(document.documentElement, ''),
         pre = (Array.prototype.slice
@@ -199,5 +201,6 @@
         
     });
 
-    this.Sidebar = Sidebar;
-})();
+    return Sidebar;
+}); 
+}) ( typeof define === 'function' && define.amd ? define : function (name, requires, factory) { if(typeof name === 'function') { factory = name; } else if(typeof requires === 'function') { factory = requires; } if(typeof module != 'undefined'){ module.exports = factory(require); }else if(typeof window != 'undefined'){ window.Sidebar= factory(); } }, this);
