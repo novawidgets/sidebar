@@ -35,7 +35,7 @@
             },
 
             // 内部属性
-            status: 0,              // 0: off, 1: on
+            status: 0              // 0: off, 1: on
         },
 
         setup: function() {
