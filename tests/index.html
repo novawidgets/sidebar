@@ -3,12 +3,10 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
-        <title>NovaUI Sidebar组件</title>
-        <style type="text/css">
-            body {
-                margin: 0;
-                padding: 0;
-            }
+        <title>Test</title>
+        <link rel="stylesheet" href="http://s4.qhimg.com/static/c8243de50db4649c/mocha.css" />
+        <link rel="stylesheet" href="http://s3.qhimg.com/static/9b788b893b345ebf/reset.css">
+        <style>
 
             #page {
                 position: relative;
@@ -16,21 +14,41 @@
             }
 
             .main {
+                background: #f88;
                 text-align: center;
-                background-color: white;
                 overflow: hidden;
                 height: 800px;
                 width: 100%;
             }
+
+            nova-sidebar[unresolved] {
+                opacity: 0;
+            }
+
+            nova-sidebar {
+                background: white;
+            }
         </style>
-        <link rel="stylesheet" href="../build/sidebar.1.0.1.css" />
-        <link rel="stylesheet" href="http://s4.qhimg.com/static/c8243de50db4649c/mocha.css" />
     </head>
     <body>
+        <script type="text/javascript" src="http://s0.qhimg.com/static/24fee17ef5eeefee/zepto_touch_fx.112.js"></script>
+        <script type="text/javascript" src="http://s0.qhimg.com/static/05e5e157e7b8d30d/mocha.js"></script>
+        <script type="text/javascript" src="http://s4.qhimg.com/static/3277fa15cc2352ec/chai.js"></script>
+        <script type="text/javascript" src="http://s0.qhimg.com/static/a544ceb156ebf3bf/sinon.js"></script>
+
+        <script src="http://s0.qhimg.com/static/c194ef77618ac141/nova_polyfills.1.0.0.js"></script>
+        <script src="http://s3.qhimg.com/static/5b2aff99b028fffa/nova.1.0.0.js"></script>
+
+        <link rel="import" href="../src/nova-sidebar/main.html" />
+        <script src="http://s1.qhimg.com/static/8a4094068d25f2cc/nova_dev.1.0.0.js"></script>
+
+        <!-- 编译后的main.js
+        <script src="../src/nova-sidebar/main.js"></script>
+        -->
         <div id="page">
-            <div class="sidebar">
-                This is pannel
-            </div>
+            <nova-sidebar unresolved>
+                This is panel
+            </nova-sidebar>
             <div class="main">
                 <p>
                     Push from left
@@ -50,52 +68,43 @@
                 </p>
             </div>
         </div>
-        <script type="text/javascript" src="http://s0.qhimg.com/static/24fee17ef5eeefee/zepto_touch_fx.112.js"></script>
-        <script type="text/javascript" src="http://s0.qhimg.com/static/05e5e157e7b8d30d/mocha.js"></script>
-        <script type="text/javascript" src="http://s4.qhimg.com/static/3277fa15cc2352ec/chai.js"></script>
-        <script type="text/javascript" src="http://s0.qhimg.com/static/a544ceb156ebf3bf/sinon.js"></script>
-
-        <script src="../libs/widget.1.0.2.js"></script>
-        <script src="../build/sidebar.1.0.1.js"></script>
-
         <script type="text/javascript">
-            var sidebar = new Sidebar({
-                element: '.sidebar',
-                contentSelector: '.main'
-            });
+            var sidebar = document.querySelector('nova-sidebar');
 
-            var btn = $('.panel-trigger');
-            var btn2 = $('.panel-trigger2');
-            var btn3 = $('.panel-trigger3');
-            var btn4 = $('.panel-trigger4');
-            btn.on('tap', function() {
-                sidebar.push();
-            });
-            btn2.on('tap', function() {
-                sidebar.overlay();
-            });
-            btn3.on('tap', function() {
-                sidebar.reveal();
-            });
-            btn4.on('tap', function() {
-                sidebar.push('right');
-            });
+            Nova.ready([sidebar], function() {
+                var btn = $('.panel-trigger');
+                var btn2 = $('.panel-trigger2');
+                var btn3 = $('.panel-trigger3');
+                var btn4 = $('.panel-trigger4');
+                btn.on('tap', function() {
+                    sidebar.push();
+                });
+                btn2.on('tap', function() {
+                    sidebar.overlay();
+                });
+                btn3.on('tap', function() {
+                    sidebar.reveal();
+                });
+                btn4.on('tap', function() {
+                    sidebar.push('right');
+                });
 
-            sidebar.on('beforeopen', function() {
-                console.log('beforeopen');
-            });
-            sidebar.on('afteropen', function() {
-                console.log('afteropen');
-            });
-            sidebar.on('beforeclose', function() {
-                console.log('beforeclose');
-            });
-            sidebar.on('afterclose', function() {
-                console.log('afterclose');
-            });
+                sidebar.on('beforeopen', function() {
+                    console.log('beforeopen');
+                });
+                sidebar.on('afteropen', function() {
+                    console.log('afteropen');
+                });
+                sidebar.on('beforeclose', function() {
+                    console.log('beforeclose');
+                });
+                sidebar.on('afterclose', function() {
+                    console.log('afterclose');
+                });
 
-            sidebar.before('show', function(ev, display, position) {
-                console.log(arguments);
+                sidebar.before('show', function(ev, display, position) {
+                    console.log(arguments);
+                });
             });
         </script>
     </body>

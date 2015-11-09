@@ -1,0 +1,266 @@
+<template is="dom-module">
+    <style>
+        :host {
+            display: block;
+            position: absolute;
+            height: 100%;
+            top: 0;
+            box-sizing: border-box;
+        }
+        .sidebar-mask {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            width: 100%;
+            z-index: 5;
+        }
+
+        :host.sidebar-overlay {
+            z-index: 4;
+        }
+
+        :host.sidebar-left {
+            left: 0;
+        }
+
+        :host.sidebar-right {
+            right: 0;
+        }
+
+        .sidebar-mask.sidebar-left {
+            right: 0;
+            left: auto;
+        }
+
+        .sidebar-mask.sidebar-right {
+            left: 0;
+            right: auto;
+        }
+
+    </style>
+    <template>
+        <div class="sidebar-mask sidebar"></div>
+    </template>
+    <script>
+        var prefix = getPrefix();
+        Nova.Components.NovaSidebar = Nova({
+            is: 'nova-sidebar',
+            props: {
+                // 动画时长
+                durationMs: {
+                    type: Number,
+                    value: 200
+                },
+                // 交互方式：push, overlay, reveal
+                display: {
+                    type: String,
+                    value: 'push'
+                },
+                // 位置：left, right
+                position: {
+                    type: String,
+                    value: 'left'
+                },
+
+                contentSelector: {
+                    type: String
+                },
+
+                classNames: {
+                    type: Object,
+                    value: function() {
+                        return {
+                            left: 'sidebar-left',
+                            right: 'sidebar-right',
+                            push: 'sidebar-push',
+                            overlay: 'sidebar-overlay',
+                            reveal: 'sidebar-reveal',
+                            mask: 'sidebar-mask'
+                        }
+                    }
+                },
+
+                status: {
+                    type: Number,
+                    value: 0
+                }
+
+            },
+            createdHandler: function() {
+                this.$element = $(this);
+                var ele = this.$element;
+                var self = this;
+
+                // 保存display, position初始值 
+                this.defaultDisplay = this.display;
+                this.defaultPosition = this.position;
+
+                this.content = this.contentSelector ? $(this.contentSelector) : ele.next();
+                this.mask = ele.children('.sidebar-mask');
+                this.mask.appendTo(ele.parent()).hide();
+                this.mask.on('tap', function() {
+                    self.hide();
+                });
+                $(window).on('resize', function() {
+                    self.mask.width(ele.parent().width() - ele.width());
+                });
+
+                this.on('_statusChanged', this._onChangeStatus);
+                this.on('_displayChanged', this._onChangeDisplay);
+                this.on('_positionChanged', this._onChangePosition);
+
+                this._onChangePosition(null, undefined, this.position);
+                this._onChangeDisplay(null, undefined, this.display);
+
+                this._initDisplayFun();
+
+                // 初始化位置
+                var pos = this._getDisplayPos();
+
+                // 初始化位置 
+                ele.css(this._getXCssObj(pos['sidebar'][0]));
+                this.content.css(this._getXCssObj(pos['cont'][0]));
+
+            },
+            /*
+            * function toggle([display], [position])
+            * @param {String} display 显示方式
+            * @param {String} position 位置
+            *
+            * toggle()  传入为空时使用默认值
+            * */
+            toggle: function(display, position) {
+                var curStatus = this.status;
+                if(curStatus == 0) {
+                    display = display || this.defaultDisplay;
+                    position = position || this.defaultPosition;
+                    this.show(display, position);
+                } else {
+                    this.hide();
+                }
+            },
+
+            show: function(display, position) {
+                this.set('display', display);
+                this.set('position', position);
+                this.set('status', 1);
+            },
+
+            hide: function() {
+                this.set('status', 0);
+            },
+
+            // 定义了push, overlay, reveal 等方法
+            _initDisplayFun: function() {
+                var me = this;
+                var displayMethods = ['push', 'overlay', 'reveal']; 
+
+                $.each(displayMethods, function(index, method) {
+                    me[method] = function(position) {
+                        me.toggle(method, position);
+                    }
+                });
+            },
+
+            _onChangeStatus: function(ev, oldStatus, newStatus) {
+                if(newStatus == 1) {
+                    this._show();
+                } else {
+                    this._hide();
+                }
+            },
+
+            _onChangeDisplay: function(ev, prev, val) {
+                var ele = this.$element;
+                var classNames = this.classNames;
+                classNames[prev] && ele.removeClass(classNames[prev]);
+                classNames[val] && ele.addClass(classNames[val]);
+            },
+
+            _onChangePosition: function(ev, prev, val) {
+                var ele = this.$element;
+                var classNames = this.classNames;
+                classNames[prev] && ele.removeClass(classNames[prev]) && this.mask.removeClass(classNames[prev]);
+                classNames[val] && ele.addClass(classNames[val]) && this.mask.addClass(classNames[val]);
+            },
+
+            _show: function() {
+                var ele = this.$element;
+                var pos = this._getDisplayPos();
+                var duration = this.durationMs;
+
+                // 初始化位置 
+                ele.css(prefix.css + 'transition', 'none');
+                this.content.css(prefix.css + 'transition', 'none');
+                ele.css(this._getXCssObj(pos['sidebar'][0]));
+                this.content.css(this._getXCssObj(pos['cont'][0]));
+                
+                // 开始动画
+                ele.animate(this._getXCssObj(pos['sidebar'][1]), duration, 'ease');
+                this.content.animate(this._getXCssObj(pos['cont'][1]), duration, 'ease');
+
+                // 显示mask
+                this.mask.width(ele.parent().width() - ele.width());
+                this.mask.show();
+            },
+
+            _hide: function() {
+                var ele = this.$element;
+                var pos = this._getDisplayPos();
+                var duration = this.durationMs;
+
+                // 开始动画
+                ele.animate(this._getXCssObj(pos['sidebar'][0]), duration, 'ease');
+                this.content.animate(this._getXCssObj(pos['cont'][0]), duration, 'ease');
+
+                // 隐藏mask
+                this.mask.hide();
+            },
+
+            _getDisplayPos: function() {
+                var width = this.$element.width(); 
+                var dir = this.position == 'left' ? 1 : -1;
+                var display = this.display;
+
+                var pos = {
+                    push: {
+                        sidebar: [-dir * width, 0],         // [from, to]
+                        cont: [0, dir * width]
+                    },
+                    overlay: {
+                        sidebar: [-dir * width, 0],
+                        cont: [0, 0]
+                    },
+                    reveal: {
+                        sidebar: [0, 0],
+                        cont: [0, dir * width]
+                    }
+                };
+
+                return pos[display];
+            },
+            _getXCssObj: function(offsetX) {
+                var cssObj = {};
+                cssObj[prefix.css + 'transform'] = 'translate3d(' + offsetX + 'px, 0, 0)';
+
+                return cssObj
+            }
+        });
+
+        function getPrefix() {
+            var styles = window.getComputedStyle(document.documentElement, ''),
+            pre = (Array.prototype.slice
+                   .call(styles)
+                   .join('') 
+                   .match(/-(moz|webkit|ms)-/) || (styles.OLink === '' && ['', 'o'])
+                  )[1],
+                  dom = ('WebKit|Moz|MS|O').match(new RegExp('(' + pre + ')', 'i'))[1];
+                  return {
+                      dom: dom,
+                      lowercase: pre,
+                      css: '-' + pre + '-',
+                      js: pre[0].toUpperCase() + pre.substr(1)
+                  };
+        }
+    </script>
+</template>
